@@ -1,0 +1,198 @@
+{
+  "$jason": {
+    "head": {
+      "title": "Huge Font Twitter",
+      "description": "Twitter with Huge fonts",
+      "actions": {
+        "$pull": {
+          "trigger": "reload"
+        },
+        "$load": {
+          "trigger": "reload"
+        },
+        "reload": {
+          "trigger": "twitter"
+        },
+        "twitter": {
+          "type": "$oauth.request",
+          "options": {
+            "version": "0",
+            "path": "/1.1/statuses/home_timeline.json",
+            "scheme": "https",
+            "host": "api.twitter.com"
+          },
+          "success": [
+            {
+              "{{#if Array.isArray($jason)}}": {
+                "type": "$render"
+              }
+            },
+            {
+              "{{#else}}": {
+                "type": "$oauth.unauth",
+                "options": {
+                  "host": "api.twitter.com",
+                  "version": "0"
+                },
+                "success": {
+                  "type": "$back"
+                }
+              }
+            }
+          ],
+          "error": {
+            "trigger": "error"
+          }
+        },
+        "error": {
+          "type": "$oauth.unauth",
+          "options": {
+            "host": "api.twitter.com",
+            "version": "0"
+          },
+          "success": {
+            "type": "$back"
+          }
+        }
+      },
+      "templates": {
+        "body": {
+          "nav": {
+            "style": {
+              "background": "#1da1f2",
+              "status": "dark",
+              "color": "#ffffff"
+            },
+            "items": [
+              {
+                "type": "menu",
+                "image": "https://s3.amazonaws.com/www.textcast.co/icons/settings%402x.png",
+                "style": {
+                  "color": "#ffffff"
+                },
+                "action": {
+                  "type": "$oauth.unauth",
+                  "options": {
+                    "version": "0",
+                    "host": "api.twitter.com"
+                  },
+                  "success": {
+                    "type": "$back"
+                  }
+                }
+              }
+            ]
+          },
+          "sections": [
+            {
+              "items": {
+                "{{#each $jason}}": [
+                  {
+                    "{{#if /https/.test(text)}}": {
+                      "type": "horizontal",
+                      "href": {
+                        "url": "{{text.replace(/.*(https:\\/\\/[/.a-zA-Z0-9]+).*/, '$1')}}",
+                        "view": "SafariView"
+                      },
+                      "style": {
+                        "padding": "10",
+                        "spacing": "10"
+                      },
+                      "components": [
+                        {
+                          "type": "image",
+                          "url": "{{user.profile_image_url_https}}",
+                          "style": {
+                            "width": "50"
+                          }
+                        },
+                        {
+                          "type": "vertical",
+                          "components": [
+                            {
+                              "type": "label",
+                              "style": {
+                                "font": "HelveticaNeue-CondensedBold",
+                                "size": "25"
+                              },
+                              "text": "{{user.screen_name}}"
+                            },
+                            {
+                              "type": "label",
+                              "style": {
+                                "font": "HelveticaNeue-Bold",
+                                "color": "#cacaca",
+                                "size": "25"
+                              },
+                              "text": "{{user.name}}"
+                            },
+                            {
+                              "type": "label",
+                              "text": "{{text.replace(/https:\\/\\/[/.a-zA-Z0-9]+/g, '')}}",
+                              "style": {
+                                "font": "HelveticaNeue-Bold",
+                                "size": "30"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "{{#else}}": {
+                      "type": "horizontal",
+                      "style": {
+                        "padding": "10",
+                        "spacing": "10"
+                      },
+                      "components": [
+                        {
+                          "type": "image",
+                          "url": "{{user.profile_image_url_https}}",
+                          "style": {
+                            "width": "50"
+                          }
+                        },
+                        {
+                          "type": "vertical",
+                          "components": [
+                            {
+                              "type": "label",
+                              "style": {
+                                "font": "HelveticaNeue-CondensedBold",
+                                "size": "25"
+                              },
+                              "text": "{{user.screen_name}}"
+                            },
+                            {
+                              "type": "label",
+                              "style": {
+                                "font": "HelveticaNeue-Bold",
+                                "color": "#cacaca",
+                                "size": "25"
+                              },
+                              "text": "{{user.name}}"
+                            },
+                            {
+                              "type": "label",
+                              "text": "{{text.replace(/https:\\/\\/[/.a-zA-Z0-9]+/g, '>>')}}",
+                              "style": {
+                                "font": "HelveticaNeue-Bold",
+                                "size": "30"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
